@@ -6,6 +6,8 @@
     const center = size / 2;
     const fontSize = 20;
     const perimeterFontSize = 11;
+    const textOffset = 5; // Distance text sits from the circle line
+    const textRadius = radius + textOffset;
 </script>
 
 <svg class="circle" width={size} height={size} style="transform: translate(-50%, -50%);">
@@ -32,7 +34,7 @@
     <defs>
         <path
             id="circlePath-{data.id}"
-            d="M {center},{size / 2 - radius} A {radius},{radius} 0 1,1 {center - 0.01},{size / 2 - radius}"
+            d="M {center},{size / 2 - textRadius} A {textRadius},{textRadius} 0 1,1 {center - 0.01},{size / 2 - textRadius}"
         />
     </defs>
     <text class="perimeterText" fill="black" font-size={perimeterFontSize}>
