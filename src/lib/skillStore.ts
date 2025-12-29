@@ -4,22 +4,23 @@ export interface NodeData {
 }
 
 const nodeDataStore: ReadonlyMap<string, NodeData> = new Map([
-    ["Pirate", { age: 6 }],
-    ["Treasure hunts", { age: 12, dependency: "Pirate" }],
-    ["Boat", { age: 12, dependency: "Pirate" }],
-    ["Secret base", { age: 12, dependency: "Pirate" }],
+    ["Pirat", { age: 6 }],
+    ["Treasure hunts", { age: 12, dependency: "Pirat" }],
+    ["Boat", { age: 12, dependency: "Pirat" }],
+    ["Secret base", { age: 12, dependency: "Pirat" }],
     ["Geocaching", { age: 18, dependency: "Treasure hunts" }],
     ["Metal detecting", { age: 18, dependency: "Treasure hunts" }],
     ["Sailing", { age: 18, dependency: "Boat" }],
     ["Fishing", { age: 18, dependency: "Boat" }],
     ["Treehouse building", { age: 18, dependency: "Secret base" }],
     ["Hideout design", { age: 18, dependency: "Secret base" }],
-    ["Knight", { age: 6 }],
-    ["Princess", { age: 6 }],
-    ["Wizard", { age: 6 }],
-    ["Dragon", { age: 6 }],
-    ["Farmer", { age: 6 }],
-    ["Builder", { age: 6 }],
+    ["Riddare", { age: 6 }],
+    ["Slåss med pinnar", { age: 12, dependency: "Riddare" }],
+    ["Prinsessa", { age: 6 }],
+    ["Trollkarl", { age: 6 }],
+    ["Drake", { age: 6 }],
+    ["Polis", { age: 6 }],
+    ["Uppfinnare", { age: 6 }],
 
 ]);
 

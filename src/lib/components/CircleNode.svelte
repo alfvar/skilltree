@@ -13,6 +13,10 @@
     
     const { getViewport } = useSvelteFlow();
     
+    // Calculate approximate text width
+    let textWidth = $derived((data.perimeterLabel || 'Label').length * perimeterFontSize * 0.6);
+    let padding = 4;
+    
     // Calculate text position based on viewport
     let textPosition = $derived.by(() => {
         const viewport = getViewport();
@@ -56,6 +60,16 @@
         fill="transparent"
         stroke="black"
         stroke-width="1"
+    />
+    
+    <!-- White background for sticky text -->
+    <rect
+        x={textPosition.x - textWidth / 2 - padding}
+        y={textPosition.y - perimeterFontSize / 2 - padding}
+        width={textWidth + padding * 2}
+        height={perimeterFontSize + padding * 2}
+        fill="white"
+        rx="2"
     />
     
     <!-- Sticky text that follows viewport -->
