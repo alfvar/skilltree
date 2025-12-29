@@ -1,10 +1,12 @@
 <script>
-    import { SvelteFlow, Background } from "@xyflow/svelte";
+    import { SvelteFlow, Background, SvelteFlowProvider } from "@xyflow/svelte";
     import "@xyflow/svelte/dist/style.css";
     import CircleNode from "$lib/components/CircleNode.svelte";
     import PieSliceNode from "$lib/components/PieSliceNode.svelte";
+    import CameraController from "$lib/components/CameraController.svelte";
     import { backgroundNodes } from "$lib/backgroundNodes";
     import { renderSkillNodes } from "$lib/renderSkillNodes";
+    import { getRingSegmentCenter } from "$lib/utils/coordinateUtils";
 
     const nodeTypes = {
         circle: CircleNode,
@@ -14,10 +16,10 @@
     let currentDependency = $state(undefined);
     let parentAngleRange = $state({ start: 0, end: 360 });
     
-    // Center viewport on (0,0)
-    let viewport = $state({ 
-        x: typeof window !== 'undefined' ? window.innerWidth / 2 : 500, 
-        y: typeof window !== 'undefined' ? window.innerHeight / 2 : 400, 
+    // Calculate initial viewport to center (0,0) on screen
+    let viewport = $state({
+        x: typeof window !== 'undefined' ? window.innerWidth / 2 : 960,
+        y: typeof window !== 'undefined' ? window.innerHeight / 2 : 540,
         zoom: 2
     });
 
@@ -29,6 +31,22 @@
         ...backgroundNodes, 
         ...renderSkillNodes(currentDependency, parentAngleRange)
     ]);
+
+    // Calculate camera target position when nodes change
+    let cameraTarget = $derived.by(() => {
+        if (currentDependency === undefined) return null;
+        
+        const skillNodes = renderSkillNodes(currentDependency, parentAngleRange);
+        if (skillNodes.length === 0) return null;
+        
+        const firstNode = skillNodes[0];
+        return getRingSegmentCenter(
+            firstNode.data.innerRadius,
+            firstNode.data.outerRadius,
+            parentAngleRange.start,
+            parentAngleRange.end
+        );
+    });
 
     let edges = $state.raw([
         { id: "e1-circle", source: "1", target: "circle" },
@@ -60,6 +78,7 @@
         {viewport}
         onnodeclick={handleNodeClick}
     >
+        <CameraController targetCenter={cameraTarget} />
         <Background color="#888" />
     </SvelteFlow>
 </div>
