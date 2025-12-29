@@ -28,8 +28,8 @@
     });
 
     let nodes = $derived.by(() => [
-        ...backgroundNodes, 
-        ...renderSkillNodes(currentDependency, parentAngleRange)
+        ...renderSkillNodes(currentDependency, parentAngleRange),
+        ...backgroundNodes,
     ]);
 
     // Calculate camera target position when nodes change

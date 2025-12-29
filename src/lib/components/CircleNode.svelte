@@ -1,4 +1,6 @@
 <script>
+    import { useSvelteFlow } from "@xyflow/svelte";
+    
     let { data } = $props();
     
     const size = data.size || 300;
@@ -8,9 +10,45 @@
     const perimeterFontSize = 11;
     const textOffset = 5; // Distance text sits from the circle line
     const textRadius = radius + textOffset;
+    
+    const { getViewport } = useSvelteFlow();
+    
+    // Calculate text position based on viewport
+    let textPosition = $derived.by(() => {
+        const viewport = getViewport();
+        
+        // Get screen dimensions
+        const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1920;
+        const screenHeight = typeof window !== 'undefined' ? window.innerHeight : 1080;
+        
+        // Convert screen center to flow coordinates
+        // Formula: flowCoord = (screenCoord - viewportTranslation) / zoom
+        const viewportCenterX = (screenWidth / 2 - viewport.x) / viewport.zoom;
+        const viewportCenterY = (screenHeight / 2 - viewport.y) / viewport.zoom;
+        
+        // Calculate vector from circle center (0,0 in flow) to viewport center
+        const dx = viewportCenterX;
+        const dy = viewportCenterY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // If viewport is very close to circle center, default to top position
+        if (distance < 10) {
+            return { x: center, y: center - textRadius };
+        }
+        
+        // Calculate angle pointing FROM circle center TOWARDS viewport center
+        const angleToViewport = Math.atan2(dy, dx);
+        
+        // Position text on the circle edge in SVG coordinates
+        // The circle in SVG is centered at (center, center)
+        const textX = center + textRadius * Math.cos(angleToViewport);
+        const textY = center + textRadius * Math.sin(angleToViewport);
+        
+        return { x: textX, y: textY };
+    });
 </script>
 
-<svg class="circle" width={size} height={size} style="transform: translate(-50%, -50%);">
+<svg class="circle" width={size} height={size} style="transform: translate(-50%, -50%); pointer-events: none; overflow: visible;">
     <circle
         r={radius}
         cx={center}
@@ -19,28 +57,19 @@
         stroke="black"
         stroke-width="1"
     />
-    <text
-        class="nodeText"
-        text-anchor="middle"
-        font-size={fontSize}
-        fill="black"
-        x={center}
-        y={center + 5}
-    >
-        {data.label}
-    </text>
     
-    <!-- Text along the perimeter -->
-    <defs>
-        <path
-            id="circlePath-{data.id}"
-            d="M {center},{size / 2 - textRadius} A {textRadius},{textRadius} 0 1,1 {center - 0.01},{size / 2 - textRadius}"
-        />
-    </defs>
-    <text class="perimeterText" fill="black" font-size={perimeterFontSize}>
-        <textPath href="#circlePath-{data.id}" startOffset="20%" text-anchor="middle">
-            {data.perimeterLabel || 'Label along perimeter'}
-        </textPath>
+    <!-- Sticky text that follows viewport -->
+    <text
+        class="stickyText"
+        text-anchor="middle"
+        dominant-baseline="middle"
+        font-size={perimeterFontSize}
+        fill="black"
+        font-weight="bold"
+        x={textPosition.x}
+        y={textPosition.y}
+    >
+        {data.perimeterLabel || 'Label'}
     </text>
 </svg>
 
@@ -57,5 +86,10 @@
     .perimeterText {
         user-select: none;
         font-family: monospace;
+    }
+    
+    .stickyText {
+        user-select: none;
+        pointer-events: none;
     }
 </style>
