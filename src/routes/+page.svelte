@@ -13,6 +13,13 @@
 
     let currentDependency = $state(undefined);
     let parentAngleRange = $state({ start: 0, end: 360 });
+    
+    // Center viewport on (0,0)
+    let viewport = $state({ 
+        x: typeof window !== 'undefined' ? window.innerWidth / 2 : 500, 
+        y: typeof window !== 'undefined' ? window.innerHeight / 2 : 400, 
+        zoom: 2
+    });
 
     $effect(() => {
         console.log("currentDependency:", currentDependency);
@@ -50,7 +57,7 @@
         {edges}
         {nodeTypes}
         nodesDraggable={false}
-        initialViewport={{ zoom: 0.5, x: 0, y: 0 }}
+        {viewport}
         onnodeclick={handleNodeClick}
     >
         <Background color="#888" />
